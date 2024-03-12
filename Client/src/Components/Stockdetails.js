@@ -1,44 +1,53 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios'; // Assuming you switch to axios for consistency
+import axios from 'axios';
 
 const StockDetails = () => {
-  const [stockData, setStockData] = useState({});
-  const [quote, setQuote] = useState({});
+  const [originalData, setOriginalData] = useState([]);
+  const [details, setDetails] = useState([]);
   const [error, setError] = useState('');
   const { symbol } = useParams();
 
   useEffect(() => {
-    async function fetchData() {
+    const fetchDetails = async () => {
       try {
-        const stockResponse = await axios.get(`/api/stock/${symbol}`);
-        setStockData(stockResponse.data['Weekly Time Series'] || {});
-
-        const quoteResponse = await axios.get(`/api/quote/${symbol}`);
-        setQuote(quoteResponse.data['Global Quote'] || {});
+        const response = await axios.get(`/api/stock/${symbol}`);
+        const weeklyTimeSeries = response.data["Weekly Time Series"];
+        const chartData = Object.entries(weeklyTimeSeries).map(([date, data]) => ({
+          date,
+          open: parseFloat(data["1. open"]),
+          high: parseFloat(data["2. high"]),
+          low: parseFloat(data["3. low"]),
+          close: parseFloat(data["4. close"]),
+          volume: parseFloat(data["5. volume"]),
+        }));
+        setOriginalData(chartData);
+        setDetails(chartData);
       } catch (error) {
-        console.error('There was an error fetching the stock data:', error);
+        console.error("Error fetching details:", error);
         setError('Error fetching data. Please try again later.');
       }
-    }
-    fetchData();
+    };
+
+    fetchDetails();
   }, [symbol]);
 
   if (error) return <div>Error fetching data: {error}</div>;
-  if (!Object.keys(stockData).length || !Object.keys(quote).length) return <div>Loading...</div>;
+  if (!details.length) return <div>Loading...</div>;
 
-  const { lastPrice, highPrice, lowPrice, volume, openPrice, previousClose } = quote;
+  // Assuming you want to display the last entry in the details array
+  const { date, open, high, low, close, volume } = details[details.length - 1] || {};
 
   return (
     <div>
       <h1>{symbol}</h1>
       <h2>Trading Details</h2>
-      <p><strong>Last Price:</strong> ${lastPrice}</p>
-      <p><strong>High:</strong> ${highPrice}</p>
-      <p><strong>Low:</strong> ${lowPrice}</p>
+      <p><strong>Date:</strong> {date}</p>
+      <p><strong>Open:</strong> ${open}</p>
+      <p><strong>High:</strong> ${high}</p>
+      <p><strong>Low:</strong> ${low}</p>
+      <p><strong>Close:</strong> ${close}</p>
       <p><strong>Volume:</strong> {volume}</p>
-      <p><strong>Open Price:</strong> ${openPrice}</p>
-      <p><strong>Previous Close:</strong> ${previousClose}</p>
     </div>
   );
 };

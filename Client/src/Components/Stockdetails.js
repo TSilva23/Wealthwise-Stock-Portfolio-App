@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useParams } from 'react-router-dom';
 
-function StockDetails({ match }) {
-  const { symbol } = match.params;
+function StockDetails() {
+  const { symbol } = useParams();
   const [stockData, setStockData] = useState(null);
   const [quote, setQuote] = useState(null);
 

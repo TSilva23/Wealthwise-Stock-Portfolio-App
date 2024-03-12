@@ -7,6 +7,7 @@ function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/" element={<StockList />} />
         <Route path="/api/all-stocks" element={<StockList />} />
         <Route path="/stock/:symbol" element={<StockDetails />} />
       </Routes>

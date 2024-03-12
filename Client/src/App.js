@@ -1,14 +1,13 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import StockList from './Components/Stocklist';
 import StockDetails from './Components/Stockdetails';
+import AllStocksPage from './Components/Stocklist';
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<StockList />} />
-        <Route path="/api/all-stocks" element={<StockList />} />
+        <Route path="/" element={<AllStocksPage/>} />
         <Route path="/stock/:symbol" element={<StockDetails />} />
       </Routes>
     </Router>

@@ -1,47 +1,47 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 
-function StockDetails() {
-  const { symbol } = useParams();
+const StockDetails = ({ match }) => {
   const [stockData, setStockData] = useState(null);
   const [quote, setQuote] = useState(null);
+  const [error, setError] = useState(null);
+  const symbol = match.params.symbol;
 
   useEffect(() => {
-    axios.get(`/api/stock/${symbol}`)
-      .then(response => {
-        setStockData(response.data);
-      })
-      .catch(error => console.error('There was an error fetching the stock data:', error));
+    async function fetchData() {
+      try {
+        const stockResponse = await fetch(`/api/stock/${symbol}`);
+        const stockDetailsJson = await stockResponse.json();
+        setStockData(stockDetailsJson['Weekly Time Series']);
 
-    axios.get(`/api/quote/${symbol}`)
-      .then(response => {
-        setQuote(response.data["Global Quote"]);
-      })
-      .catch(error => console.error('There was an error fetching the stock quote:', error));
+        const quoteResponse = await fetch(`/api/quote/${symbol}`);
+        const quoteDetailsJson = await quoteResponse.json();
+        setQuote(quoteDetailsJson['Global Quote']);
+      } catch (error) {
+        console.error('There was an error fetching the stock data:', error);
+        setError(error);
+      }
+    }
+    fetchData();
   }, [symbol]);
+
+  if (error) return <div>Error fetching data: {error.message}</div>;
+  if (!stockData || !quote) return <div>Loading...</div>;
+
+  const { name } = stockData;
+  const { lastPrice, highPrice, lowPrice, volume, openPrice, previousClose } = quote;
 
   return (
     <div>
-      <h2>Stock Details: {symbol}</h2>
-      {stockData && (
-        <div>
-          <h3>Weekly Time Series</h3>
-          {/* Implement the visualization of time series data */}
-        </div>
-      )}
-      {quote && (
-        <div>
-          <h3>Latest Quote</h3>
-          <p>Open: {quote["02. open"]}</p>
-          <p>High: {quote["03. high"]}</p>
-          <p>Low: {quote["04. low"]}</p>
-          <p>Price: {quote["05. price"]}</p>
-          <p>Volume: {quote["06. volume"]}</p>
-        </div>
-      )}
+      <h1>{name} ({symbol})</h1>
+      <h2>Trading Details</h2>
+      <p><strong>Last Price:</strong> ${lastPrice}</p>
+      <p><strong>High:</strong> ${highPrice}</p>
+      <p><strong>Low:</strong> ${lowPrice}</p>
+      <p><strong>Volume:</strong> {volume}</p>
+      <p><strong>Open Price:</strong> ${openPrice}</p>
+      <p><strong>Previous Close:</strong> ${previousClose}</p>
     </div>
   );
-}
+};
 
 export default StockDetails;

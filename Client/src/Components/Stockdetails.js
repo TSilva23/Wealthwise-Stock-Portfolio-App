@@ -1,38 +1,37 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios'; // Assuming you switch to axios for consistency
 
-const StockDetails = ({ match }) => {
-  const [stockData, setStockData] = useState(null);
-  const [quote, setQuote] = useState(null);
-  const [error, setError] = useState(null);
-  const symbol = match.params.symbol;
+const StockDetails = () => {
+  const [stockData, setStockData] = useState({});
+  const [quote, setQuote] = useState({});
+  const [error, setError] = useState('');
+  const { symbol } = useParams();
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const stockResponse = await fetch(`/api/stock/${symbol}`);
-        const stockDetailsJson = await stockResponse.json();
-        setStockData(stockDetailsJson['Weekly Time Series']);
+        const stockResponse = await axios.get(`/api/stock/${symbol}`);
+        setStockData(stockResponse.data['Weekly Time Series'] || {});
 
-        const quoteResponse = await fetch(`/api/quote/${symbol}`);
-        const quoteDetailsJson = await quoteResponse.json();
-        setQuote(quoteDetailsJson['Global Quote']);
+        const quoteResponse = await axios.get(`/api/quote/${symbol}`);
+        setQuote(quoteResponse.data['Global Quote'] || {});
       } catch (error) {
         console.error('There was an error fetching the stock data:', error);
-        setError(error);
+        setError('Error fetching data. Please try again later.');
       }
     }
     fetchData();
   }, [symbol]);
 
-  if (error) return <div>Error fetching data: {error.message}</div>;
-  if (!stockData || !quote) return <div>Loading...</div>;
+  if (error) return <div>Error fetching data: {error}</div>;
+  if (!Object.keys(stockData).length || !Object.keys(quote).length) return <div>Loading...</div>;
 
-  const { name } = stockData;
   const { lastPrice, highPrice, lowPrice, volume, openPrice, previousClose } = quote;
 
   return (
     <div>
-      <h1>{name} ({symbol})</h1>
+      <h1>{symbol}</h1>
       <h2>Trading Details</h2>
       <p><strong>Last Price:</strong> ${lastPrice}</p>
       <p><strong>High:</strong> ${highPrice}</p>

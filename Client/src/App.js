@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import axios from 'axios';
 import StockDetails from './Components/Stockdetails';
 import StockList from './Components/Stocklist';
+import LoginForm from './Components/Loginform';
 
 function App() {
   const [stocks, setAllStocks] = useState([]);
@@ -22,6 +23,29 @@ function App() {
       result.push(obj);
     }
     return result;
+  };
+
+  const handleLogin = async (username, password) => {
+    try {
+      const response = await fetch('/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+      const data = await response.json();
+      if (data.token) {
+        // Save the token locally (localStorage/sessionStorage)
+        localStorage.setItem('token', data.token);
+        // Redirect or change the component state as logged in
+      } else {
+        // Handle login error (e.g., show an error message)
+        console.error('Login failed');
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+    }
   };
 
   useEffect(() => {
@@ -49,6 +73,7 @@ function App() {
       <Routes>
         <Route path="/" element={<StockList stocks={stocks} />} />
         <Route path="/stock/:symbol" element={<StockDetails />} />
+        <Route path="/login" element={<LoginForm onLogin={handleLogin} />} />
       </Routes>
     </Router>
   );

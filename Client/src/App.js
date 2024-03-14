@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import StockDetails from './Components/Stockdetails';
 import StockList from './Components/Stocklist';
+import Portfolio from './Components/Portfolio'; // Import the Portfolio component
+import AddStockToPortfolio from './Components/Addtoportfolio'; // Import the AddStockToPortfolio component
+import Login from './Components/Login';
+import Signup from './Components/Signup';
+
 
 function App() {
   const [stocks, setAllStocks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const userId = 1; // Mock user ID, replace with actual user ID retrieval logic
 
   const parseCSV = (csv) => {
     const lines = csv.split('\n');
@@ -41,15 +47,35 @@ function App() {
       });
   }, []);
 
+  const refreshPortfolio = () => {
+    // Add logic here if you need to refresh the portfolio list
+    // after adding a new stock, for example
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<StockList stocks={stocks} />} />
-        <Route path="/stock/:symbol" element={<StockDetails />} />
-      </Routes>
+      <div>
+        {/* Example navigation buttons */}
+        <nav style={{ marginBottom: '20px' }}>
+          <Link to="/" style={{ marginRight: '10px' }}>Home</Link>
+          <Link to="/portfolio" style={{ marginRight: '10px' }}>View Portfolio</Link>
+          <Link to="/add-stock" style={{ marginRight: '10px' }}>Add Stock to Portfolio</Link>
+          <Link to="/login" style={{ marginRight: '10px' }}>Login</Link>
+          <Link to="/signup" style={{ marginRight: '10px' }}>Signup</Link>
+        </nav>
+
+        <Routes>
+          <Route path="/" element={<StockList stocks={stocks} />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/stock/:symbol" element={<StockDetails />} />
+          <Route path="/portfolio" element={<Portfolio userId={1} />} />
+          <Route path="/add-stock" element={<AddStockToPortfolio userId={1} onStockAdded={() => {}} />} />
+        </Routes>
+      </div>
     </Router>
   );
 }

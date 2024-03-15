@@ -1,8 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { useUser } from './Usercontext';
 
 function StockList({ stocks }) {
+  const { userId } = useUser(); // Retrieve the current user's ID from context
   const addToPortfolio = (symbol) => {
     // Assuming you have an endpoint to fetch the current stock price and date
     axios.get(`/api/quote/${symbol}`)
@@ -12,11 +14,11 @@ function StockList({ stocks }) {
 
         // Add the stock to the portfolio
         axios.post('/api/portfolio/add', {
-          userId: 1, // Replace with actual user identification logic
-          symbol: symbol,
-          quantity: 1, // Default to 1 or customize as needed
-          acquisitionPrice: currentPrice,
-          acquisitionDate: currentDate,
+          USER_ID: userId, // Use the dynamically obtained user ID
+          SYMBOL: symbol,
+          QUANTITY: 1,
+          ACQUISITION_PRICE: currentPrice,
+          ACQUISITION_DATE: currentDate,
         })
         .then(() => alert(`${symbol} added to your portfolio.`))
         .catch(error => alert('Error adding stock to portfolio.'));

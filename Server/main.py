@@ -9,10 +9,14 @@ from datetime import datetime
 from models import db, User, Stock, Portfolio, PortfolioStock
 from sqlalchemy.pool import NullPool
 import oracledb
+from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy import Sequence
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
 ALPHA_VANTAGE_API_KEY = ('ZBD3QIPITMQNSPPF')
+app.secret_key = 'mysecretkey'  # Set this to a random secret value
+
 
 un = 'myownsh'
 pw = 'AaZZ0r_cle#1'
@@ -38,15 +42,16 @@ with app.app_context():
 def login():
     try:
         data = request.json
-        username = data.get('username')
-        password = data.get('password')
+        username = data.get('NAME')
+        password = data.get('PASSWORD_HASH')
 
-        user = User.query.filter_by(name=username).first()
+        user = User.query.filter_by(NAME=username).first()
         print(user)
-
+        
         if user and user.check_password(password):
-            session['user_id'] = user.user_id
-            return jsonify({'message': 'Login successful'}), 200
+            session['user_id'] = user.USER_ID  # Store user ID in session
+
+            return jsonify({'message': 'Login successful', 'USER_ID': user.USER_ID}), 200
         else:
             return jsonify({'message': 'Invalid username or password'}), 401
     except Exception as e:
@@ -57,14 +62,16 @@ def login():
 def signup():
     try:
         data = request.json
+        email = data.get('EMAIL')
         username = data.get('NAME')
         password = data.get('PASSWORD_HASH')
-
         existing_user = User.query.filter_by(NAME=username).first()
         if existing_user:
             return jsonify({'message': 'User already exists'}), 409
-
         new_user = User(NAME=username)
+        seq_val = db.session.execute(Sequence('user_id_seq'))
+        new_user.USER_ID = seq_val
+        new_user.EMAIL = (email)
         new_user.set_password(password)
         
         db.session.add(new_user)
@@ -80,45 +87,54 @@ def logout():
     session.clear()
     return jsonify({'message': 'Logged out successfully'}), 200
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 @app.route('/api/portfolio/add', methods=['POST'])
 def add_stock_to_portfolio():
-    try:
-        data = request.json
-        user_id = data.get('USERID')
-        symbol = data.get('SYMBOL')
-        quantity = data.get('QUANTITY')
-        acquisition_price = data.get('ACQUISITIONPRICE')
-        acquisition_date = datetime.strptime(data.get('ACQUISITIONDATE'), '%Y-%m-%d')
+    data = request.json
+    symbol = data.get('SYMBOL')
+    added_quantity = data.get('QUANTITY')
+    user_id = session.get('USER_ID')  # Assuming user_id is stored in session upon login
 
-        user = User.query.filter_by(USER_ID=user_id).first()
-        if not user:
-            return jsonify({"error": "User not found"}), 404
+    if not user_id:
+        return jsonify({'message': 'User is not logged in.'}), 401
 
-        stock = Stock.query.filter_by(SYMBOL=symbol).first()
-        if not stock:
-            return jsonify({"error": "Stock not found"}), 404
+    stock = Stock.query.filter_by(SYMBOL=symbol).first()
+    if not stock:
+        return jsonify({'message': 'Stock not found'}), 404
 
-        portfolio = Portfolio.query.filter_by(USER_ID=user_id).first()
-        if not portfolio:
-            portfolio = Portfolio(USER_ID=user_id)
-            db.session.add(portfolio)
-            db.session.commit()
+    portfolio = Portfolio.query.filter_by(USER_ID=user_id).first()
+    if not portfolio:
+        portfolio = Portfolio(USER_ID=user_id)
+        db.session.add(portfolio)
+        db.session.commit()
 
+    portfolio_stock = PortfolioStock.query.filter_by(
+        PORTFOLIO_ID=portfolio.PORTFOLIO_ID,
+        STOCK_ID=stock.STOCK_ID
+    ).first()
+
+    if portfolio_stock:
+        portfolio_stock.QUANTITY += added_quantity
+    else:
+        acquisition_date = data.get('ACQUISITION_DATE')  # Assuming acquisition_date is provided in the request
         portfolio_stock = PortfolioStock(
             PORTFOLIO_ID=portfolio.PORTFOLIO_ID,
             STOCK_ID=stock.STOCK_ID,
-            QUANTITY=quantity,
-            ACQUISITION_PRICE=acquisition_price,
+            QUANTITY=added_quantity,
+            ACQUISITION_PRICE=data.get('ACQUISITION_PRICE'),
             ACQUISITION_DATE=acquisition_date
         )
         db.session.add(portfolio_stock)
-        db.session.commit()
 
-        return jsonify({"message": "Stock successfully added to portfolio"}), 200
-    except Exception as e:
-        db.session.rollback()  # Roll back the session in case of error
-        return jsonify({"error": str(e)}), 500
+    db.session.commit()
 
+    return jsonify({
+        'message': 'Stock quantity updated in portfolio',
+        'updated_quantity': portfolio_stock.QUANTITY
+    }), 200
 
 @app.route('/api/portfolio/<int:user_id>', methods=['GET'])
 def view_portfolio(user_id):
@@ -130,14 +146,18 @@ def view_portfolio(user_id):
     stocks_details = []
     for ps in portfolio_stocks:
         stock = Stock.query.filter_by(STOCK_ID=ps.STOCK_ID).first()
-        stock_detail = {
-            "symbol": stock.SYMBOL,
-            "name": stock.NAME,
-            "quantity": ps.QUANTITY,
-            "acquisition_price": ps.ACQUISITION_PRICE,
-            "acquisition_date": ps.ACQUISITION_DATE.strftime('%Y-%m-%d')
-        }
-        stocks_details.append(stock_detail)
+        if stock:  # Make sure stock is found
+            stock_detail = {
+                "symbol": stock.SYMBOL,
+                "name": stock.NAME,
+                "quantity": ps.QUANTITY,
+                "acquisition_price": ps.ACQUISITION_PRICE,
+                "acquisition_date": ps.ACQUISITION_DATE.strftime('%Y-%m-%d')  # Correctly format the date
+            }
+            stocks_details.append(stock_detail)
+        else:
+            # Handle the case where the stock is not found
+            return jsonify({"error": f"Stock with ID {ps.STOCK_ID} not found in the STOCK table"}), 404
 
     return jsonify(stocks_details), 200
 

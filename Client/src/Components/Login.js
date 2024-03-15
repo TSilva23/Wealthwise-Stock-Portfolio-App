@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useUser } from './Usercontext';
 
 function Login() {
   const [NAME, setUsername] = useState('');
   const [PASSWORD_HASH, setPassword] = useState('');
+  const { setUserId } = useUser();
   const navigate = useNavigate();
-
   const handleSubmit = (e) => {
     e.preventDefault();
     axios.post('/login', { NAME, PASSWORD_HASH })
       .then(response => {
         alert(response.data.message); // Show login success message
+        setUserId(response.data.USER_ID);
+        localStorage.setItem('USER_ID', response.data.USER_ID);
         navigate('/'); // Redirect to homepage or dashboard after successful login
       })
       .catch(error => {

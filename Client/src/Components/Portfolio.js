@@ -2,14 +2,14 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const Portfolio = ({ userId }) => {
+const Portfolio = ({ USER_ID }) => {
   const [portfolio, setPortfolio] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
     setLoading(true);
-    axios.get(`/api/portfolio/${userId}`)
+    axios.get(`/api/portfolio/${USER_ID}`)
       .then(response => {
         setPortfolio(response.data);
         setLoading(false);
@@ -19,7 +19,7 @@ const Portfolio = ({ userId }) => {
         setError('Failed to load portfolio. Please try again later.');
         setLoading(false);
       });
-  }, [userId]);
+  }, [USER_ID]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;

@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useUser } from './Usercontext'; // Import the hook from your context file
+
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Chart } from 'react-chartjs-2';

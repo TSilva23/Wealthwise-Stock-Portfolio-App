@@ -4,11 +4,11 @@ import { useUser } from './Usercontext'; // Adjust the import path as needed
 
 const AddStockToPortfolio = ({ onStockAdded }) => {
   const { userId } = useUser(); // Use the useUser hook to access userId
-  const [SYMBOL, setSymbol] = useState('');
+  const [SYMBOL, setSYMBOL] = useState('');
   const [QUANTITY, setQuantity] = useState('');
   const [ACQUISITION_PRICE, setAcquisitionPrice] = useState('');
   const [ACQUISITION_DATE, setAcquisitionDate] = useState('');
-  const [ERROR, setError] = useState('');
+  const [error, setError] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -17,15 +17,19 @@ const AddStockToPortfolio = ({ onStockAdded }) => {
       return;
     }
     axios.post('/api/portfolio/add', {
-      USER_ID: userId, // Use userId from the context
       SYMBOL,
-      QUANTITY: parseInt(QUANTITY, 10),
-      ACQUISITION_PRICE: parseFloat(ACQUISITION_PRICE),
+      QUANTITY,
+      ACQUISITION_PRICE,
       ACQUISITION_DATE
+    }, {
+      headers: {
+        // Assuming you are using sessions; if token-based auth, adjust accordingly
+        'Authorization': `Bearer ${userId}`
+      }
     })
     .then(() => {
       onStockAdded();
-      setSymbol('');
+      setSYMBOL('');
       setQuantity('');
       setAcquisitionPrice('');
       setAcquisitionDate('');
@@ -40,12 +44,12 @@ const AddStockToPortfolio = ({ onStockAdded }) => {
   return (
     <form onSubmit={handleSubmit}>
       <h2>Add Stock to Portfolio</h2>
-      <input type="text" value={SYMBOL} onChange={e => setSymbol(e.target.value)} placeholder="Stock Symbol" required />
+      <input type="text" value={SYMBOL} onChange={e => setSYMBOL(e.target.value)} placeholder="Stock SYMBOL" required />
       <input type="number" value={QUANTITY} onChange={e => setQuantity(e.target.value)} placeholder="Quantity" required />
       <input type="text" value={ACQUISITION_PRICE} onChange={e => setAcquisitionPrice(e.target.value)} placeholder="Acquisition Price" required />
       <input type="date" value={ACQUISITION_DATE} onChange={e => setAcquisitionDate(e.target.value)} placeholder="Acquisition Date" required />
       <button type="submit">Add to Portfolio</button>
-      {ERROR && <p>{ERROR}</p>}
+      {error && <p>{error}</p>}
     </form>
   );
 };

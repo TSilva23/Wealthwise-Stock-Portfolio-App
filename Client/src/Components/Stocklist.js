@@ -18,7 +18,7 @@ function StockList({ stocks }) {
           SYMBOL: symbol,
           QUANTITY: 1,
           ACQUISITION_PRICE: currentPrice,
-          ACQUISITION_DATE: currentDate,
+          ACQUISITION_DATE: currentDate
         })
         .then(() => alert(`${symbol} added to your portfolio.`))
         .catch(error => alert('Error adding stock to portfolio.'));

@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, Response, request, session
+from flask import Flask, jsonify, Response, request, session, make_response
 from flask_cors import CORS
 import requests
 import logging
@@ -42,7 +42,7 @@ def login():
         user = User.query.filter_by(NAME=username).first()
 
         if user and user.check_password(password):
-            session['user_id'] = user.USER_ID  # Store user ID in session
+            session.get['USER_ID'] = user.USER_ID  # Store user ID in session
             return jsonify({'message': 'Login successful', 'USER_ID': user.USER_ID}), 200
         else:
             return jsonify({'message': 'Invalid username or password'}), 401
@@ -78,9 +78,11 @@ def signup():
 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
-    if 'user_id' in session:
-        session.pop('user_id')
-        return jsonify({'message': 'User logged out'}), 200
+    if 'USER_ID' in session:
+        session.pop('USER_ID', None)
+        response = make_response(jsonify({'message': 'Logout successful'}))
+        response.set_cookie('session', '', expires=0)  # Set the session cookie to expire immediately
+        return response, 200
     else:
         return jsonify({'message': 'User is not logged in'}), 401
 

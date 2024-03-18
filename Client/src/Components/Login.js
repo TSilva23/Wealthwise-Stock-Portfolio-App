@@ -10,7 +10,7 @@ function Login() {
   const navigate = useNavigate();
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios.post('/login', { NAME, PASSWORD_HASH })
+    axios.post('https://capstoneprojectmcsbt1.ew.r.appspot.com/login', { NAME, PASSWORD_HASH })
       .then(response => {
         alert(response.data.message); // Show login success message
         setUserId(response.data.USER_ID);

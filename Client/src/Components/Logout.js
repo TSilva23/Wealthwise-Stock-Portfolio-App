@@ -8,10 +8,10 @@ function Logout() {
     
     const handleLogout = () => {
         setIsLoading(true); // Begin loading
-        axios.post('/logout')
+        axios.post('https://capstoneprojectmcsbt1.ew.r.appspot.com/logout')
             .then(response => {
                 alert(response.data.message); // Show logout success message
-                navigate('/login'); // Redirect to login page after successful logout
+                navigate('https://capstoneprojectmcsbt1.ew.r.appspot.com/login'); // Redirect to login page after successful logout
             })
             .catch(error => {
                 alert(error.response?.data?.message || 'An error occurred'); // Show error message, handling potential undefined errors

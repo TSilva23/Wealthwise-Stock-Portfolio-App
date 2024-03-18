@@ -13,10 +13,10 @@ function Signup() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios.post('/signup', { NAME, PASSWORD_HASH, EMAIL })
+    axios.post('https://capstoneprojectmcsbt1.ew.r.appspot.com/signup', { NAME, PASSWORD_HASH, EMAIL })
       .then(response => {
         alert(response.data.message); // Show signup success message
-        navigate('/login'); // Redirect to login page after successful signup
+        navigate('https://capstoneprojectmcsbt1.ew.r.appspot.com/login'); // Redirect to login page after successful signup
       })
       .catch(error => {
         alert(error.response.data.message); // Show error message

@@ -19,7 +19,7 @@ const StockDetails = () => {
     const fetchDetails = async () => {
       try {
         // Fetch the historical data for the stock
-        const response = await axios.get(`/api/stock/${symbol}`);
+        const response = await axios.get(`https://capstoneprojectmcsbt1.ew.r.appspot.com/api/stock/${symbol}`);
         const weeklyTimeSeries = response.data['Weekly Time Series'];
         const chartData = Object.entries(weeklyTimeSeries).map(([date, data]) => ({
           date,
@@ -33,7 +33,7 @@ const StockDetails = () => {
         setDetails(chartData[0]); // Assume the latest entry is the first one
 
         // Fetch the latest quote for the stock
-        const quoteResponse = await axios.get(`/api/quote/${symbol}`);
+        const quoteResponse = await axios.get(`https://capstoneprojectmcsbt1.ew.r.appspot.com/api/quote/${symbol}`);
         const quoteData = quoteResponse.data['Global Quote'];
         setLatestQuote({
           open: parseFloat(quoteData['02. open']),

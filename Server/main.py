@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, Response, request, session, make_response
+from flask import Flask, jsonify, Response, request, session, make_response, redirect
 from flask_cors import CORS
 import requests
 import logging
@@ -10,7 +10,15 @@ from sqlalchemy import Sequence
 import datetime
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True)
+CORS(app, supports_credentials=True, origins=["https://tristancapstonepr.storage.googleapis.com"]) 
+app.config['SESSION_COOKIE_SECURE'] = True
+app.config['REMEMBER_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+app.config['SECRET_KEY'] = 'mysecretkey'
+app.config['SQLALCHEMY_ECHO'] = True
+
+
 ALPHA_VANTAGE_API_KEY = 'ZBD3QIPITMQNSPPF'
 app.secret_key = 'mysecretkey'
 
@@ -26,8 +34,6 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     'creator': pool.acquire,
     'poolclass': NullPool
 }
-app.config['SQLALCHEMY_ECHO'] = True
-app.config['SECRET_KEY'] = 'mysecretkey'
 db.init_app(app)
 
 
@@ -142,7 +148,7 @@ def add_stock_to_portfolio():
     }), 200
 
 
-@app.route('/api/portfolio/', methods=['GET'])
+@app.route('/api/portfolio', methods=['GET'])
 def view_portfolio():
     user_id = session.get('USER_ID')
     if not user_id:

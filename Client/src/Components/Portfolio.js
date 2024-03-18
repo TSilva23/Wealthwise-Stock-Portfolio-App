@@ -13,8 +13,8 @@ const Portfolio = () => {
     const fetchPortfolio = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`/api/portfolio`, {
-          headers: {
+        const response = await axios.get(`https://capstoneprojectmcsbt1.ew.r.appspot.com/api/portfolio`, { withCredentials: true, headers: 
+          {
             'Authorization': `Bearer ${userId}`
           }
         });

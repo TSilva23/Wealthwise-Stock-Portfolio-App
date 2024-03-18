@@ -7,13 +7,13 @@ function StockList({ stocks }) {
   const { userId } = useUser(); // Retrieve the current user's ID from context
   const addToPortfolio = (symbol) => {
     // Assuming you have an endpoint to fetch the current stock price and date
-    axios.get(`/api/quote/${symbol}`)
+    axios.get(`https://capstoneprojectmcsbt1.ew.r.appspot.com/api/quote/${symbol}`)
       .then(response => {
         const currentPrice = response.data['Global Quote']['05. price'];
         const currentDate = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 
         // Add the stock to the portfolio
-        axios.post('/api/portfolio/add', {
+        axios.post('https://capstoneprojectmcsbt1.ew.r.appspot.com/api/portfolio/add', {
           USER_ID: userId, // Use the dynamically obtained user ID
           SYMBOL: symbol,
           QUANTITY: 1,
@@ -38,7 +38,7 @@ function StockList({ stocks }) {
       <ul>
         {stocks.map((stock, index) => (
           <li key={stock.symbol || index}>
-            <Link to={`/stock/${stock.symbol}`} style={{ marginRight: '10px' }}>
+            <Link to={`https://capstoneprojectmcsbt1.ew.r.appspot.com/stock/${stock.symbol}`} style={{ marginRight: '10px' }}>
               {stock.symbol} - {stock.name}
             </Link>
             <button onClick={() => addToPortfolio(stock.symbol)}>Add to Portfolio</button>

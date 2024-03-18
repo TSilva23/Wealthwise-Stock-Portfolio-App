@@ -16,7 +16,7 @@ function App() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    axios.get('/api/all-stocks', { responseType: 'text' })
+    axios.get('https://capstoneprojectmcsbt1.ew.r.appspot.com/api/all-stocks', { responseType: 'text' })
       .then(response => {
         const parseCSV = (csv) => {
           const lines = csv.split('\n');

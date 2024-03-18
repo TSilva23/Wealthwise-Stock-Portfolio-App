@@ -37,12 +37,12 @@ def login():
     try:
         data = request.json
         username = data.get('NAME')
-        password = data.get('PASSWORD_HASH')
+        password = data.get('PASSWORD_HASH')  # This should likely be 'PASSWORD' if you're sending plain text passwords
 
         user = User.query.filter_by(NAME=username).first()
 
-        if user and user.check_password(password):
-            session.get['USER_ID'] = user.USER_ID  # Store user ID in session
+        if user and user.check_password(password):  # Assuming check_password() correctly handles the hashed password comparison
+            session['USER_ID'] = user.USER_ID  # Correctly store user ID in session
             return jsonify({'message': 'Login successful', 'USER_ID': user.USER_ID}), 200
         else:
             return jsonify({'message': 'Invalid username or password'}), 401
@@ -149,28 +149,47 @@ def view_portfolio():
         return jsonify({"error": "User not logged in"}), 401
 
     portfolio = Portfolio.query.filter_by(USER_ID=user_id).first()
-
     if not portfolio:
         return jsonify({"error": "Portfolio not found"}), 404
 
     portfolio_stocks = PortfolioStock.query.filter_by(PORTFOLIO_ID=portfolio.PORTFOLIO_ID).all()
     stocks_details = []
+    total_current_value = 0
+
     for ps in portfolio_stocks:
         stock = Stock.query.filter_by(STOCK_ID=ps.STOCK_ID).first()
         if stock:
+            response = requests.get(
+                f"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={stock.SYMBOL}&apikey={ALPHA_VANTAGE_API_KEY}"
+            )
+            response_json = response.json()
+            try:
+                current_price = float(response_json["Global Quote"]["05. price"])
+            except KeyError:
+                current_price = None
+                app.logger.error(f"Could not fetch current price for {stock.SYMBOL}")
+
+            if current_price is not None:
+                current_value = current_price * ps.QUANTITY
+                total_current_value += current_value
+            else:
+                current_value = None
+
             stock_detail = {
-                'STOCK_ID': ps.STOCK_ID,  # Changed 'id' to 'stock_id' to avoid conflict with 'id' in the response
+                'STOCK_ID': ps.STOCK_ID,
                 "SYMBOL": stock.SYMBOL,
                 "NAME": stock.NAME,
                 "QUANTITY": ps.QUANTITY,
                 "ACQUISITION_PRICE": ps.ACQUISITION_PRICE,
-                "ACQUISITION_DATE": ps.ACQUISITION_DATE
+                "ACQUISITION_DATE": ps.ACQUISITION_DATE,
+                "CURRENT_PRICE": current_price,
+                "CURRENT_VALUE": current_value
             }
             stocks_details.append(stock_detail)
         else:
             app.logger.error(f"Stock with ID {ps.STOCK_ID} not found in the STOCK table")
 
-    return jsonify(stocks_details), 200
+    return jsonify({"stocks": stocks_details, "total_current_value": total_current_value}), 200
 
 
 @app.route('/api/portfolio/create', methods=['POST'])

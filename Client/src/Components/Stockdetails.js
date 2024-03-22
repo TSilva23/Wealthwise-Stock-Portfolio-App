@@ -7,7 +7,7 @@ import { Chart } from 'react-chartjs-2';
 import "chart.js/auto";
 import "chartjs-adapter-date-fns";
 
-// StockDetails component to display the details of a stock
+
 const StockDetails = () => {
   const [originalData, setOriginalData] = useState([]);
   const [details, setDetails] = useState({});

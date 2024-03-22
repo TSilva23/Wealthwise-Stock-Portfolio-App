@@ -8,6 +8,7 @@ import oracledb
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import Sequence
 import datetime
+import os
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True, origins=["https://tristancapstonepr.storage.googleapis.com"]) 
@@ -15,18 +16,18 @@ app.config['SESSION_COOKIE_SECURE'] = True
 app.config['REMEMBER_COOKIE_SECURE'] = True
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'None'
-app.config['SECRET_KEY'] = 'mysecretkey'
+app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')
 app.config['SQLALCHEMY_ECHO'] = True
 
 
-ALPHA_VANTAGE_API_KEY = 'ZBD3QIPITMQNSPPF'
-app.secret_key = 'mysecretkey'
+app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'default-secret-key')
+ALPHA_VANTAGE_API_KEY = os.getenv('ALPHA_VANTAGE_KEY')
+oracle_db_username = os.getenv('ORACLE_DB_USERNAME', '')
+oracle_db_password = os.getenv('ORACLE_DB_PASSWORD', '')
+oracle_db_dsn = os.getenv('ORACLE_DB_DSN', '')
 
-un = 'myownsh'
-pw = 'AaZZ0r_cle#1'
-dsn = '(description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1521)(host=adb.eu-madrid-1.oraclecloud.com))(connect_data=(service_name=g94a0d92b10bb94_p1plm1xfn2614jm8_high.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))'
-
-pool = oracledb.create_pool(user=un, password=pw, dsn=dsn)
+# Oracle DB pool creation with environment variables
+pool = oracledb.create_pool(user=oracle_db_username, password=oracle_db_password, dsn=oracle_db_dsn)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'oracle+oracledb://'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

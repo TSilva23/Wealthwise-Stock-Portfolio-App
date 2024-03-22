@@ -38,8 +38,8 @@ function StockList({ stocks }) {
       <ul>
         {stocks.map((stock, index) => (
           <li key={stock.symbol || index}>
-            <Link to={`https://capstoneprojectmcsbt1.ew.r.appspot.com/stock/${stock.symbol}`} style={{ marginRight: '10px' }}>
-              {stock.symbol} - {stock.name}
+            <Link to={`/stock/${stock.symbol}`} style={{ marginRight: '10px' }}>
+              {stock.name} ({stock.symbol})
             </Link>
             <button onClick={() => addToPortfolio(stock.symbol)}>Add to Portfolio</button>
           </li>

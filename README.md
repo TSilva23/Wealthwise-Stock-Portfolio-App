@@ -1,70 +1,55 @@
-# Getting Started with Create React App
+# Wealthwise - Stocks Portfolio App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Welcome to Wealthwise, a stocks portfolio app created using React, Flask, and the AlphaVantage API.
 
-## Available Scripts
+I embarked on this journey to learn fullstack development and apply what I have learned so far of Python and JavaScript.
 
-In the project directory, you can run:
+Learning to use React was one of the high points of this project for me. But without a doubt, learning to think like a full-stack developer is the most valuable lesson I've learned from this project.
 
-### `npm start`
+The UI might be updated (sooner, or later), but this first version is built around functionality and efficiency first and foremost.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+The next step for me is learning more about CSS frameworks like BootStrap and implement it in my next projects.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Frontend
 
-### `npm test`
+The frontend of the app can be accessed at the following URL:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+[http://tristancapstonepr.storage.googleapis.com/](http://tristancapstonepr.storage.googleapis.com/)
 
-### `npm run build`
+## Backend
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+The backend of the app is hosted at the following URL:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+[https://capstoneprojectmcsbt1.ew.r.appspot.com/](https://capstoneprojectmcsbt1.ew.r.appspot.com/)
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+To use the mock user, use the following credentials:
 
-### `npm run eject`
+- Username: user2
+- Password: 1234
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Otherwise, feel free to register. It works!
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Getting Started
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+To get started with the Wealthwise app, follow these steps:
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+1. Clone the repository to your local machine.
+2. Install the necessary dependencies for both the frontend and backend.
+3. Configure the AlphaVantage API key in the backend.
+4. Start the frontend and backend servers.
+5. Access the app in your browser using the provided URLs.
 
-## Learn More
+## Features
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- View and manage your stocks portfolio.
+- Get real-time stock prices and market data using the AlphaVantage API.
+- Perform various actions such as buying and selling stocks.
+- Track your portfolio performance and view historical data.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Contributing
 
-### Code Splitting
+We welcome contributions to the Wealthwise app! If you would like to contribute feel free contact me.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## License
 
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+This project is licensed under the [IE LICENSE](LICENSE).

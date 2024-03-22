@@ -1,9 +1,0 @@
-runtime: python39
-
-env_variables:
-  FLASK_SECRET_KEY: "mysecretkey"
-  ALPHA_VANTAGE_KEY: "PBBOCARQLUUHKQBA"
-  ORACLE_DB_USERNAME: "myownsh"
-  ORACLE_DB_PASSWORD: "AaZZ0r_cle#1"
-  ORACLE_DB_DSN: "(description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1521)(host=adb.eu-madrid-1.oraclecloud.com))(connect_data=(service_name=g94a0d92b10bb94_p1plm1xfn2614jm8_high.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))"
-

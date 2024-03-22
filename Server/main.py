@@ -200,6 +200,16 @@ def add_stock_to_portfolio():
 
 @app.route('/api/portfolio/remove', methods=['POST'])
 def remove_stock_from_portfolio():
+    """
+    Removes a stock from the user's portfolio.
+
+    Returns:
+        A JSON response containing a message and the updated quantity of the stock in the portfolio.
+
+    Raises:
+        401: If the user is not logged in.
+        404: If the stock or portfolio is not found in the database.
+    """
     data = request.json
     symbol = data.get('SYMBOL')
     user_id = session.get('USER_ID')
@@ -244,6 +254,16 @@ def remove_stock_from_portfolio():
 
 @app.route('/api/portfolio', methods=['GET'])
 def view_portfolio():
+    """
+    View the portfolio of the logged-in user.
+
+    Returns:
+        A JSON response containing the stocks in the portfolio and the total current value.
+
+    Raises:
+        401: If the user is not logged in.
+        404: If the portfolio is not found.
+    """
     user_id = session.get('USER_ID')
     if not user_id:
         return jsonify({"error": "User not logged in"}), 401
@@ -294,6 +314,13 @@ def view_portfolio():
 
 @app.route('/api/portfolio/create', methods=['POST'])
 def create_portfolio():
+    """
+    Create a new portfolio for the logged-in user.
+
+    Returns:
+        A JSON response containing a success message if the portfolio is created successfully,
+        or an error message if the user is not logged in or if a portfolio already exists.
+    """
     user_id = session.get('USER_ID')
     if not user_id:
         return jsonify({"error": "User not logged in"}), 401
@@ -308,12 +335,18 @@ def create_portfolio():
     db.session.add(new_portfolio)
     db.session.commit()
 
-
     return jsonify({"message": "Portfolio created successfully"}), 201
 
 
 @app.route('/api/all-stocks/')
 def all_stocks():
+    """
+    Retrieves a list of all stocks from Alpha Vantage API.
+
+    Returns:
+        If successful, returns a response with the content type 'text/csv' containing the stock data.
+        If unsuccessful, returns a JSON response with an error message and the corresponding HTTP status code.
+    """
     url = f'https://www.alphavantage.co/query?function=LISTING_STATUS&apikey={ALPHA_VANTAGE_API_KEY}'
 
     try:
@@ -330,6 +363,15 @@ def all_stocks():
 
 @app.route('/api/stock/<symbol>')
 def stock_data(symbol):
+    """
+    Retrieves weekly stock data for a given symbol from Alpha Vantage API.
+
+    Parameters:
+    symbol (str): The stock symbol to retrieve data for.
+
+    Returns:
+    dict: A JSON response containing the stock data.
+    """
     url = f'https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol={symbol}&apikey={ALPHA_VANTAGE_API_KEY}'
     response = requests.get(url)
     return jsonify(response.json())
@@ -337,6 +379,15 @@ def stock_data(symbol):
 
 @app.route('/api/quote/<symbol>')
 def stock_quote(symbol):
+    """
+    Retrieves the stock quote for a given symbol.
+
+    Args:
+        symbol (str): The stock symbol to retrieve the quote for.
+
+    Returns:
+        dict: A JSON object containing the stock quote information.
+    """
     url = f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={symbol}&apikey={ALPHA_VANTAGE_API_KEY}'
     response = requests.get(url)
     return jsonify(response.json())

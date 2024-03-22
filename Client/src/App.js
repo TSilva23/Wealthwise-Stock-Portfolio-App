@@ -10,29 +10,38 @@ import Login from './Components/Login';
 import Signup from './Components/Signup';
 import Logout from './Components/Logout';
 
+/**
+ * Main component for the Wealthwise application.
+ * Renders the navigation bar and sets up the routing for different pages.
+ */
 function App() {
   const [stocks, setAllStocks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
+    /**
+     * Parses the CSV data  from all stocks into an array of objects.
+     * @param {string} csv - The CSV data to parse.
+     * @returns {Object[]} - An array of objects representing the parsed data.
+     */
+    const parseCSV = (csv) => {
+      const lines = csv.split('\n');
+      const result = [];
+      const headers = lines[0].split(',');
+      for (let i = 1; i < lines.length; i++) {
+        const obj = {};
+        const currentline = lines[i].split(',');
+        for (let j = 0; j < headers.length; j++) {
+          obj[headers[j]] = currentline[j];
+        }
+        result.push(obj);
+      }
+      return result;
+    };
+
     axios.get('https://capstoneprojectmcsbt1.ew.r.appspot.com/api/all-stocks', { responseType: 'text' })
       .then(response => {
-        const parseCSV = (csv) => {
-          const lines = csv.split('\n');
-          const result = [];
-          const headers = lines[0].split(',');
-          for (let i = 1; i < lines.length; i++) {
-            const obj = {};
-            const currentline = lines[i].split(',');
-            for (let j = 0; j < headers.length; j++) {
-              obj[headers[j]] = currentline[j];
-            }
-            result.push(obj);
-          }
-          return result;
-        };
-
         const parsedData = parseCSV(response.data);
         setAllStocks(parsedData);
         setLoading(false);

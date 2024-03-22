@@ -6,7 +6,7 @@ import { useUser } from './Usercontext';
 function StockList({ stocks }) {
   const { userId } = useUser(); // Retrieve the current user's ID from context
   const addToPortfolio = (symbol) => {
-    // Assuming you have an endpoint to fetch the current stock price and date
+    // Connecting to the endpoint to fetch the current stock price and date
     axios.get(`https://capstoneprojectmcsbt1.ew.r.appspot.com/api/quote/${symbol}`)
       .then(response => {
         const currentPrice = response.data['Global Quote']['05. price'];

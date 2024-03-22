@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useUser } from './Usercontext';
 
+// Portfolio component to display the user's portfolio
 const Portfolio = () => {
   const [portfolio, setPortfolio] = useState([]);
   const [totalValue, setTotalValue] = useState(0);
@@ -19,7 +20,7 @@ const Portfolio = () => {
       setLoading(false);
       return;
     }
-
+// Connecting to the endpoint to fetch the user's portfolio
     try {
       setLoading(true);
       const response = await axios.get(`https://capstoneprojectmcsbt1.ew.r.appspot.com/api/portfolio`, {
@@ -42,6 +43,7 @@ const Portfolio = () => {
   };
 
   const removeStock = async (symbol) => {
+    // Connecting to the endpoint to remove the stock from the portfolio
     try {
       const response = await axios.post('https://capstoneprojectmcsbt1.ew.r.appspot.com/api/portfolio/remove', 
         { SYMBOL: symbol }, 

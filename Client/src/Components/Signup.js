@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 axios.defaults.withCredentials = true;
 
-
+// Signup component to allow users to create an account
 function Signup() {
   const [NAME, setName] = useState('');
   const [EMAIL, setEmail] = useState('');

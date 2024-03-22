@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useUser } from './Usercontext'; // Adjust the import path as needed
+import { useUser } from './Usercontext'; 
+
+// AddStockToPortfolio component to allow users to add a stock to their portfolio
 
 const AddStockToPortfolio = ({ onStockAdded }) => {
   const { userId } = useUser(); // Use the useUser hook to access userId
@@ -23,7 +25,7 @@ const AddStockToPortfolio = ({ onStockAdded }) => {
       ACQUISITION_DATE
     }, {
       headers: {
-        // Assuming you are using sessions; if token-based auth, adjust accordingly
+        // Assuming you are using sessions for authentication
         'Authorization': `Bearer ${userId}`
       }
     })

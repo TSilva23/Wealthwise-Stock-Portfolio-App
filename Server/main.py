@@ -40,14 +40,28 @@ db.init_app(app)
 
 @app.route('/login', methods=['POST'])
 def login():
+    """
+    Endpoint for user login.
+
+    This endpoint receives a POST request with JSON data containing the user's
+    username and password. It checks if the provided username and password match
+    a user in the database. If the login is successful, it stores the user's ID
+    in the session and returns a JSON response with a success message and the user's ID.
+    If the login fails, it returns a JSON response with an error message.
+
+    Returns:
+        A JSON response with a success message and the user's ID if the login is successful.
+        A JSON response with an error message if the login fails.
+        A JSON response with an error message if an exception occurs during the login process.
+    """
     try:
         data = request.json
         username = data.get('NAME')
-        password = data.get('PASSWORD_HASH')  # This should likely be 'PASSWORD' if you're sending plain text passwords
+        password = data.get('PASSWORD_HASH')  
 
         user = User.query.filter_by(NAME=username).first()
 
-        if user and user.check_password(password):  # Assuming check_password() correctly handles the hashed password comparison
+        if user and user.check_password(password):  
             session['USER_ID'] = user.USER_ID  # Correctly store user ID in session
             return jsonify({'message': 'Login successful', 'USER_ID': user.USER_ID}), 200
         else:
@@ -59,6 +73,16 @@ def login():
 
 @app.route('/signup', methods=['POST'])
 def signup():
+    """
+    Sign up a new user.
+
+    This function handles the POST request to '/signup' endpoint and creates a new user in the database.
+
+    Returns:
+        A JSON response containing a success message and status code 201 if the user is created successfully.
+        A JSON response containing an error message and status code 409 if the user already exists.
+        A JSON response containing an error message and status code 500 if an error occurs during the process.
+    """
     try:
         data = request.json
         email = data.get('EMAIL')
@@ -84,6 +108,16 @@ def signup():
 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
+    """
+    Logout the user.
+
+    This function handles the '/logout' route and logs out the user by removing their session data and expiring the session cookie.
+
+    Returns:
+        A tuple containing the response object and the HTTP status code.
+        - If the user is logged in, the response object will contain a JSON message indicating successful logout and the status code will be 200.
+        - If the user is not logged in, the response object will contain a JSON message indicating that the user is not logged in and the status code will be 401.
+    """
     if 'USER_ID' in session:
         session.pop('USER_ID', None)
         response = make_response(jsonify({'message': 'Logout successful'}))
@@ -95,6 +129,23 @@ def logout():
 
 @app.route('/api/portfolio/add', methods=['POST'])
 def add_stock_to_portfolio():
+    """
+    Add a stock to the user's portfolio.
+
+    This function handles the POST request to add a stock to the user's portfolio.
+    It retrieves the stock details from Alpha Vantage API, checks if the user is logged in,
+    creates a new stock entry if it doesn't exist, creates a new portfolio if it doesn't exist,
+    updates the quantity of the stock in the portfolio, and returns a JSON response with the updated quantity.
+
+    Returns:
+        A JSON response with the following keys:
+        - 'message': A message indicating the success of the operation.
+        - 'updated_quantity': The updated quantity of the stock in the portfolio.
+
+    Raises:
+        401: If the user is not logged in.
+        404: If the stock details are not found.
+    """
     data = request.json
     symbol = data.get('SYMBOL')
     added_quantity = data.get('QUANTITY')
@@ -147,6 +198,49 @@ def add_stock_to_portfolio():
         'updated_quantity': portfolio_stock.QUANTITY
     }), 200
 
+@app.route('/api/portfolio/remove', methods=['POST'])
+def remove_stock_from_portfolio():
+    data = request.json
+    symbol = data.get('SYMBOL')
+    user_id = session.get('USER_ID')
+
+    if not user_id:
+        return jsonify({'message': 'User is not logged in.'}), 401
+
+    stock = Stock.query.filter_by(SYMBOL=symbol).first()
+    if not stock:
+        return jsonify({'message': 'Stock not found'}), 404
+
+    portfolio = Portfolio.query.filter_by(USER_ID=user_id).first()
+    if not portfolio:
+        return jsonify({'message': 'Portfolio not found'}), 404
+
+    portfolio_stock = PortfolioStock.query.filter_by(
+        PORTFOLIO_ID=portfolio.PORTFOLIO_ID,
+        STOCK_ID=stock.STOCK_ID
+    ).first()
+
+    if not portfolio_stock:
+        return jsonify({'message': 'Stock not found in portfolio'}), 404
+    
+    if portfolio_stock.QUANTITY > 0:
+        portfolio_stock.QUANTITY -= 1 
+        message = 'The stock quantity was successfully updated in the portfolio'
+    else:
+        db.session.delete(portfolio_stock)
+        message = 'The stock was succesfully removed from the portfolio'
+
+        
+    if portfolio_stock.QUANTITY == 0:
+        db.session.delete(portfolio_stock)
+        message = 'The stock was succesfully removed from the portfolio'
+
+    db.session.commit()
+
+    return jsonify({
+        'message': message,
+        'updated_quantity': portfolio_stock.QUANTITY if portfolio_stock.QUANTITY > 0 else 0
+    }), 200
 
 @app.route('/api/portfolio', methods=['GET'])
 def view_portfolio():

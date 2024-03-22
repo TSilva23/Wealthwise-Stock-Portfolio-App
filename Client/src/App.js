@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import axios from 'axios';
-import { UserProvider } from './Components/Usercontext'; // Make sure the path matches where you place UserContext.js
+import { UserProvider } from './Components/Usercontext';
 import StockDetails from './Components/Stockdetails';
 import StockList from './Components/Stocklist';
 import Portfolio from './Components/Portfolio';
